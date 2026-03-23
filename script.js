@@ -27,7 +27,7 @@ function getFileType(message) {
 }
 
 // 🔥 Load chat file
-fetch("chats/chat.txt")
+fetch("chats/chats/chat.txt")
   .then(res => res.text())
   .then(data => {
     allMessages = parseChat(data);
