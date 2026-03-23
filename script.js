@@ -1,21 +1,32 @@
 const chatContainer = document.getElementById("chat-container");
 const viewerSelect = document.getElementById("viewer");
 
-let VIEWER = viewerSelect.value;
+// safety check
+if (!chatContainer || !viewerSelect) {
+  console.error("Missing HTML elements");
+}
+
+// viewer
+let VIEWER = viewerSelect ? viewerSelect.value : "Mehul";
+
 let allMessages = [];
 let currentIndex = 0;
 const CHUNK_SIZE = 200;
 
-// File types
+// file types
 const imageExt = [".jpg", ".jpeg", ".png", ".webp"];
 const videoExt = [".mp4", ".webm", ".ogg"];
 const docExt = [".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".zip"];
 
-viewerSelect.addEventListener("change", () => {
-  VIEWER = viewerSelect.value;
-  resetChat();
-});
+// viewer change
+if (viewerSelect) {
+  viewerSelect.addEventListener("change", () => {
+    VIEWER = viewerSelect.value;
+    resetChat();
+  });
+}
 
+// detect file type
 function getFileType(message) {
   const lower = message.toLowerCase();
 
@@ -26,38 +37,45 @@ function getFileType(message) {
   return "text";
 }
 
-// 🔥 Load chat file
-const files = ["chat1.txt"]; // your files
+// 🔥 LOAD CHAT (SINGLE FILE ONLY)
+fetch("chats/chat.txt")
+  .then(res => {
+    console.log("Fetch status:", res.status);
+    return res.text();
+  })
+  .then(data => {
 
-async function loadAllChats() {
-  let combinedData = "";
-
-  for (let file of files) {
-    try {
-      const res = await fetch("chats/" + file);
-      const text = await res.text();
-      combinedData += text + "\n";
-    } catch (err) {
-      console.error("Error loading:", file, err);
+    if (!data) {
+      console.error("Empty chat file");
+      return;
     }
-  }
 
-  console.log("ALL DATA LENGTH:", combinedData.length);
+    // 🔥 FIX MERGED MESSAGES
+    data = data.replace(
+      /(\d{2}\/\d{2}\/\d{4}, \d{1,2}:\d{2} - )/g,
+      "\n$1"
+    );
 
-  allMessages = parseChat(combinedData);
-  console.log("TOTAL MESSAGES:", allMessages.length);
+    allMessages = parseChat(data);
 
-  resetChat();
-}
+    console.log("TOTAL MESSAGES:", allMessages.length);
 
-// 🔥 CALL THIS AT THE END
-loadAllChats();
+    if (allMessages.length === 0) {
+      console.error("Parsing failed");
+      return;
+    }
 
-// Parse
+    resetChat();
+  })
+  .catch(err => {
+    console.error("Fetch error:", err);
+  });
+
+// 🔥 FLEXIBLE PARSER
 function parseChat(data) {
   const lines = data.split("\n");
 
-  const regex = /^(\d{2}\/\d{2}\/\d{4}), (\d{1,2}:\d{2}) - (.*?): (.*)$/;
+  const regex = /^(.+?), (.+?) - (.*?): (.*)$/;
 
   return lines
     .map(line => {
@@ -73,16 +91,14 @@ function parseChat(data) {
     .filter(Boolean);
 }
 
-// 🔥 Reset chat (load newest)
+// reset
 function resetChat() {
   chatContainer.innerHTML = "";
-
   currentIndex = allMessages.length;
-
   loadInitialMessages();
 }
 
-// Load last chunk
+// load latest
 function loadInitialMessages() {
   const start = Math.max(0, currentIndex - CHUNK_SIZE);
   const slice = allMessages.slice(start, currentIndex);
@@ -93,13 +109,12 @@ function loadInitialMessages() {
 
   currentIndex = start;
 
-  // scroll to bottom
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// 🔥 Load older messages on scroll up
+// scroll up load
 chatContainer.addEventListener("scroll", () => {
-  if (chatContainer.scrollTop === 0) {
+  if (chatContainer.scrollTop <= 10) { // FIXED
     loadOlderMessages();
   }
 });
@@ -118,11 +133,10 @@ function loadOlderMessages() {
 
   currentIndex = start;
 
-  // maintain scroll position
   chatContainer.scrollTop = chatContainer.scrollHeight - prevHeight;
 }
 
-// Create message
+// create message
 function createMessage(sender, message, time, prepend) {
   const msgDiv = document.createElement("div");
 
@@ -156,7 +170,7 @@ function createMessage(sender, message, time, prepend) {
   }
 
   else {
-    msgDiv.innerHTML = message;
+    msgDiv.textContent = message; // safer than innerHTML
   }
 
   const timeDiv = document.createElement("div");
@@ -165,12 +179,9 @@ function createMessage(sender, message, time, prepend) {
 
   msgDiv.appendChild(timeDiv);
 
-  // 🔥 prepend or append
   if (prepend) {
     chatContainer.prepend(msgDiv);
   } else {
     chatContainer.appendChild(msgDiv);
   }
 }
-
-console.log("FILES:", files);
