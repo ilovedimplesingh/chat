@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const app = document.getElementById("app");
   const chatContainer = document.getElementById("chat-container");
   const viewerSelect = document.getElementById("viewer");
+  const viewerPicker = document.getElementById("viewer-picker");
+  const viewerOptionButtons = [...document.querySelectorAll(".viewer-option")];
+
   const searchInput = document.getElementById("search");
   const searchBox = document.getElementById("search-box");
   const searchUpBtn = document.getElementById("search-up");
@@ -16,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuBtn = document.getElementById("menu-btn");
   const headerMenu = document.getElementById("header-menu");
   const menuSearchBtn = document.getElementById("menu-search");
+  const menuSwitchBtn = document.getElementById("menu-switch");
 
   let VIEWER = viewerSelect ? viewerSelect.value : "Mehul";
 
@@ -37,13 +41,18 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchMatches = [];
   let activeSearchMatchIndex = -1;
 
+  function syncViewerSelect() {
+    if (!viewerSelect) return;
+    viewerSelect.value = VIEWER;
+  }
+
   function updateHeader() {
     if (!dp || !chatName) return;
 
     if (VIEWER === "Mehul") {
-      chatName.innerText = "Dimp";
+      chatName.innerText = "Dimple";
       dp.src = "media/dimp.jpg";
-      dp.alt = "Dimp";
+      dp.alt = "Dimple";
     } else {
       chatName.innerText = "Mehul";
       dp.src = "media/mehul.jpg";
@@ -66,6 +75,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Mehul wallpaper is square: keep full image visible in center without cropping.
     app.style.backgroundSize = VIEWER === "Mehul" ? "contain" : "cover";
+  }
+
+  function openViewerPicker() {
+    viewerPicker?.classList.remove("hidden");
+    headerMenu?.classList.add("hidden");
+  }
+
+  function closeViewerPicker() {
+    viewerPicker?.classList.add("hidden");
+  }
+
+  function setViewer(nextViewer) {
+    VIEWER = nextViewer;
+    syncViewerSelect();
+    updateHeader();
+    updateWallpaper();
+    resetChat();
+    closeViewerPicker();
   }
 
   function normalizeAttachmentName(rawMessage) {
@@ -112,7 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const res = await fetch(`chats/${file}`);
         if (!res.ok) continue;
-
         combinedData += `${await res.text()}\n`;
       } catch (err) {
         console.error("Error loading:", file, err);
@@ -122,7 +148,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!combinedData) return;
 
     combinedData = combinedData.replace(/(\d{2}\/\d{2}\/\d{4}, \d{1,2}:\d{2} - )/g, "\n$1");
-
     allMessages = parseChat(combinedData);
     resetChat();
   }
@@ -171,7 +196,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderMessages(messages, prepend = false) {
     let lastRenderedDate = null;
-
     const items = prepend ? [...messages].reverse() : messages;
 
     items.forEach(msg => {
@@ -259,11 +283,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let visible = separators[0];
 
     for (const separator of separators) {
-      if (separator.offsetTop - 4 <= scrollTop) {
-        visible = separator;
-      } else {
-        break;
-      }
+      if (separator.offsetTop - 4 <= scrollTop) visible = separator;
+      else break;
     }
 
     return visible;
@@ -311,7 +332,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function goToSearchResult(direction) {
     if (!searchMatches.length) return;
 
-    activeSearchMatchIndex = (activeSearchMatchIndex + direction + searchMatches.length) % searchMatches.length;
+    // Up should go to older (towards top), down should go to newer (towards bottom).
+    const nextIndex = activeSearchMatchIndex + direction;
+    if (nextIndex < 0 || nextIndex >= searchMatches.length) return;
+
+    activeSearchMatchIndex = nextIndex;
     highlightSearchMatch();
   }
 
@@ -346,12 +371,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (viewerSelect) {
     viewerSelect.addEventListener("change", () => {
-      VIEWER = viewerSelect.value;
-      updateHeader();
-      updateWallpaper();
-      resetChat();
+      setViewer(viewerSelect.value);
     });
   }
+
+  viewerOptionButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      setViewer(button.dataset.viewer);
+    });
+  });
 
   if (menuBtn && headerMenu) {
     menuBtn.addEventListener("click", e => {
@@ -366,9 +394,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (menuSearchBtn) {
-    menuSearchBtn.addEventListener("click", openSearch);
-  }
+  menuSearchBtn?.addEventListener("click", openSearch);
+  menuSwitchBtn?.addEventListener("click", openViewerPicker);
 
   searchCloseBtn?.addEventListener("click", closeSearch);
   searchUpBtn?.addEventListener("click", () => goToSearchResult(-1));
@@ -388,13 +415,10 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  if (searchInput) {
-    searchInput.addEventListener("input", () => {
-      applySearchFilter();
-    });
-  }
+  searchInput?.addEventListener("input", applySearchFilter);
 
   updateHeader();
   updateWallpaper();
+  openViewerPicker();
   loadAllChats();
 });
