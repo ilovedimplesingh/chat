@@ -187,7 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
       allMessages = [];
     }
 
-    allMessages.push(...loadLocalMessages());
     allMessages.sort(compareMessagesByTime);
     resetChat();
   }
@@ -436,8 +435,15 @@ document.addEventListener("DOMContentLoaded", () => {
     resetChat();
   }
 
+  function getFirebaseTimestamp(rawTimestamp) {
+    if (typeof rawTimestamp === "number") return rawTimestamp;
+    if (rawTimestamp && typeof rawTimestamp.toMillis === "function") return rawTimestamp.toMillis();
+    if (rawTimestamp && Number.isFinite(rawTimestamp.seconds)) return rawTimestamp.seconds * 1000;
+    return Date.now();
+  }
+
   function buildMessageFromFirebase(data, docId) {
-    const stamp = Number(data.timestamp) || Date.now();
+    const stamp = getFirebaseTimestamp(data.timestamp);
     const when = new Date(stamp);
 
     return {
@@ -469,39 +475,18 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleScrollButton();
   }
 
-  function appendLocalOnlyMessage(text) {
-    const timestamp = Date.now();
-    const when = new Date(timestamp);
-    const message = {
-      id: `local-${timestamp}`,
-      date: when.toLocaleDateString(),
-      time: when.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      sender: VIEWER,
-      message: text,
-      timestamp,
-      localOnly: true
-    };
-
-    allMessages.push(message);
-    allMessages.sort(compareMessagesByTime);
-    saveLocalMessages();
-    resetChat();
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-  }
-
   async function sendMessage(text) {
     const firestore = window.firebaseFirestore;
     const db = window.firebaseDb;
 
     if (!firestore || !db) {
-      appendLocalOnlyMessage(text);
-      return;
+      throw new Error("Firebase is not ready yet.");
     }
 
     await firestore.addDoc(firestore.collection(db, "messages"), {
       sender: VIEWER,
       message: text,
-      timestamp: Date.now()
+      timestamp: firestore.serverTimestamp()
     });
   }
 
@@ -510,7 +495,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const db = window.firebaseDb;
 
     if (!firestore || !db) {
-      console.warn("Firebase unavailable; using local chat files and localStorage.");
+      console.warn("Firebase unavailable; chat sync requires Firebase.");
       return;
     }
 
@@ -518,14 +503,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     firestore.onSnapshot(q, snapshot => {
       if (!firebaseInitialLoadDone) {
-        const firebaseMessages = snapshot.docs.map(doc => {
+        snapshot.docs.forEach(doc => {
+          if (loadedFirebaseDocIds.has(doc.id)) return;
           loadedFirebaseDocIds.add(doc.id);
-          return buildMessageFromFirebase(doc.data(), doc.id);
+          allMessages.push(buildMessageFromFirebase(doc.data(), doc.id));
         });
 
-        allMessages = [...allMessages.filter(msg => !msg.localOnly), ...firebaseMessages];
         allMessages.sort(compareMessagesByTime);
-        saveLocalMessages();
         resetChat();
         firebaseInitialLoadDone = true;
         chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -587,17 +571,30 @@ document.addEventListener("DOMContentLoaded", () => {
   sendBtn?.addEventListener("click", async () => {
     const text = input?.value.trim();
     if (!text) return;
-    await sendMessage(text);
-    input.value = "";
+
+    try {
+      await sendMessage(text);
+      input.value = "";
+    } catch (error) {
+      console.error(error);
+      alert("Could not send message to Firebase. Please check your Firebase rules/connection.");
+    }
   });
 
   input?.addEventListener("keydown", async event => {
     if (event.key !== "Enter") return;
     event.preventDefault();
+
     const text = input.value.trim();
     if (!text) return;
-    await sendMessage(text);
-    input.value = "";
+
+    try {
+      await sendMessage(text);
+      input.value = "";
+    } catch (error) {
+      console.error(error);
+      alert("Could not send message to Firebase. Please check your Firebase rules/connection.");
+    }
   });
 
   updateHeader();
