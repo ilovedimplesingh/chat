@@ -16,6 +16,7 @@ body {
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  background-color: #000;
 }
 
 /* 🔝 HEADER */
@@ -32,6 +33,7 @@ body {
 
 #chat-name {
   font-weight: 600;
+  font-size: 18px;
 }
 
 .header-actions {
@@ -44,7 +46,7 @@ body {
   background: transparent;
   color: white;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px;
   padding: 4px 8px;
 }
 
@@ -109,10 +111,21 @@ select {
 
 #search {
   flex: 1;
-  padding: 8px;
+  padding: 10px 12px;
   border-radius: 20px;
   border: none;
   outline: none;
+  font-size: 16px;
+}
+
+.search-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.search-hit {
+  outline: 2px solid #25d366;
+  outline-offset: 2px;
 }
 
 .search-nav {
@@ -137,11 +150,11 @@ select {
 
 /* 🟢 MESSAGES */
 .message {
-  max-width: min(75%, 600px);
-  padding: 8px 12px;
-  margin: 4px 0;
+  max-width: min(82%, 680px);
+  padding: 10px 14px;
+  margin: 5px 0;
   border-radius: 10px;
-  font-size: 14px;
+  font-size: 16px;
   position: relative;
   word-wrap: break-word;
 }
@@ -164,7 +177,7 @@ select {
 
 /* ⏰ TIME */
 .time {
-  font-size: 10px;
+  font-size: 11px;
   opacity: 0.7;
   margin-top: 4px;
   text-align: right;
@@ -195,7 +208,7 @@ video {
 .date-separator {
   text-align: center;
   margin: 10px 0;
-  font-size: 12px;
+  font-size: 13px;
   background: #182229;
   color: #ccc;
   padding: 5px 12px;
@@ -231,7 +244,7 @@ video {
   background: #202c33;
   color: white;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 20px;
 }
 
 /* 🖼 FULLSCREEN IMAGE OVERLAY */

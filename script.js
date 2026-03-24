@@ -61,6 +61,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const wallpaper = viewerWallpapers[VIEWER] || "";
     app.style.backgroundImage = wallpaper ? `url('${wallpaper}')` : "none";
+    app.style.backgroundPosition = "center center";
+    app.style.backgroundRepeat = "no-repeat";
+
+    // Mehul wallpaper is square: keep full image visible in center without cropping.
+    app.style.backgroundSize = VIEWER === "Mehul" ? "contain" : "cover";
   }
 
   function normalizeAttachmentName(rawMessage) {
