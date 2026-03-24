@@ -1,3 +1,6 @@
+import { collection, addDoc, onSnapshot, query, orderBy } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const app = document.getElementById("app");
   const chatContainer = document.getElementById("chat-container");
@@ -446,4 +449,69 @@ document.addEventListener("DOMContentLoaded", () => {
   updateWallpaper();
   openViewerPicker();
   loadAllChats();
+});
+
+const input = document.getElementById("msg-input");
+const btn = document.getElementById("send-btn");
+
+btn.onclick = () => {
+  if (!input.value.trim()) return;
+
+  sendMessage(input.value);
+  input.value = "";
+};
+
+import { addDoc } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+async function sendMessage(text) {
+  await addDoc(collection(db, "messages"), {
+    sender: VIEWER,
+    message: text,
+    timestamp: Date.now()
+  });
+}
+
+
+
+// 🔥 FIREBASE REAL-TIME LISTENER
+import { collection, onSnapshot, query, orderBy } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const q = query(collection(db, "messages"), orderBy("timestamp"));
+
+let firebaseLoaded = false;
+
+onSnapshot(q, (snapshot) => {
+  if (!firebaseLoaded) {
+    firebaseLoaded = true;
+    return; // skip first load (prevents duplicates)
+  }
+
+  snapshot.docChanges().forEach(change => {
+    if (change.type === "added") {
+      const msg = change.doc.data();
+
+      const newMsg = {
+        date: new Date(msg.timestamp).toLocaleDateString(),
+        time: new Date(msg.timestamp).toLocaleTimeString().slice(0,5),
+        sender: msg.sender,
+        message: msg.message
+      };
+
+      allMessages.push(newMsg);
+
+      createMessage(
+        newMsg.sender,
+        newMsg.message,
+        newMsg.time,
+        false
+      );
+    }
+  });
+
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+});
+
+  chatContainer.scrollTop = chatContainer.scrollHeight;
 });
