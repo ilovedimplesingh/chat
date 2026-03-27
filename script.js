@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const mediaCloseBtn = document.getElementById("media-close");
   const mediaList = document.getElementById("media-list");
   const mediaTabs = [...document.querySelectorAll(".media-tab")];
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
   const stickerPanel = document.getElementById("sticker-panel");
   const stickerCloseBtn = document.getElementById("sticker-close");
   const stickerList = document.getElementById("sticker-list");
@@ -33,6 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const attachStickerBtn = document.getElementById("attach-sticker");
   const attachFileBtn = document.getElementById("attach-file");
   const stickerFileInput = document.getElementById("sticker-file-input");
+=======
+>>>>>>> main
 
   const input = document.getElementById("msg-input");
   const sendBtn = document.getElementById("send-btn");
@@ -41,7 +44,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const CHUNK_SIZE = 200;
   const SEARCH_DEBOUNCE_MS = 120;
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
   const SEARCH_RESULT_LIMIT = 1500;
+=======
+>>>>>>> main
   const imageExt = [".jpg", ".jpeg", ".png", ".webp"];
   const videoExt = [".mp4", ".webm", ".ogg", ".opus"];
   const docExt = [".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".zip"];
@@ -256,6 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getSearchFilteredMessages(query) {
     const queryLower = query.toLowerCase();
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
     const matches = [];
 
     for (const msg of allMessages) {
@@ -266,6 +273,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     return matches;
+=======
+    return allMessages.filter(msg =>
+      `${msg.sender} ${msg.message} ${msg.time} ${msg.date}`.toLowerCase().includes(queryLower)
+    );
+>>>>>>> main
   }
 
   function getMediaMessages(type) {
@@ -301,8 +313,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!mediaMessages.length) {
       const emptyState = document.createElement("p");
       emptyState.className = "media-empty";
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
       const label = activeMediaType === "image" ? "photos" : activeMediaType === "video" ? "videos" : "stickers";
       emptyState.textContent = `No ${label} in chat yet.`;
+=======
+      emptyState.textContent = `No ${activeMediaType === "image" ? "photos" : "videos"} in chat yet.`;
+>>>>>>> main
       mediaList.appendChild(emptyState);
       return;
     }
@@ -318,7 +334,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const previewWrap = document.createElement("div");
       previewWrap.className = "media-preview";
 
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
       if (activeMediaType === "image" || activeMediaType === "sticker") {
+=======
+      if (activeMediaType === "image") {
+>>>>>>> main
         const img = document.createElement("img");
         img.src = path;
         img.alt = filename;
@@ -346,6 +366,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       mediaList.appendChild(card);
     });
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
   }
 
   function getStickerNames() {
@@ -409,6 +430,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } finally {
       if (sendBtn) sendBtn.disabled = false;
     }
+=======
+>>>>>>> main
   }
 
   function loadInitialMessages() {
@@ -766,6 +789,7 @@ document.addEventListener("DOMContentLoaded", () => {
       renderMediaList();
     });
   });
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
   stickerCloseBtn?.addEventListener("click", closeStickerPanel);
   stickerPanel?.addEventListener("click", event => {
     if (event.target === stickerPanel) closeStickerPanel();
@@ -798,6 +822,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     await submitOutgoingMessage(`${file.name} (file attached)`);
   });
+=======
+>>>>>>> main
 
   searchCloseBtn?.addEventListener("click", closeSearch);
   searchUpBtn?.addEventListener("click", () => goToSearchResult(-1));
