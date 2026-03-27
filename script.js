@@ -25,6 +25,10 @@ function initChatApp() {
   const mediaCloseBtn = document.getElementById("media-close");
   const mediaList = document.getElementById("media-list");
   const mediaTabs = [...document.querySelectorAll(".media-tab")];
+<<<<<<< codex/add-media-selection-option-in-menu-ets6nw
+=======
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
+>>>>>>> main
   const stickerPanel = document.getElementById("sticker-panel");
   const stickerCloseBtn = document.getElementById("sticker-close");
   const stickerList = document.getElementById("sticker-list");
@@ -33,6 +37,11 @@ function initChatApp() {
   const attachStickerBtn = document.getElementById("attach-sticker");
   const attachFileBtn = document.getElementById("attach-file");
   const stickerFileInput = document.getElementById("sticker-file-input");
+<<<<<<< codex/add-media-selection-option-in-menu-ets6nw
+=======
+=======
+>>>>>>> main
+>>>>>>> main
 
   const input = document.getElementById("msg-input");
   const sendBtn = document.getElementById("send-btn");
@@ -41,7 +50,14 @@ function initChatApp() {
 
   const CHUNK_SIZE = 200;
   const SEARCH_DEBOUNCE_MS = 120;
+<<<<<<< codex/add-media-selection-option-in-menu-ets6nw
   const SEARCH_RESULT_LIMIT = 1500;
+=======
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
+  const SEARCH_RESULT_LIMIT = 1500;
+=======
+>>>>>>> main
+>>>>>>> main
   const imageExt = [".jpg", ".jpeg", ".png", ".webp"];
   const videoExt = [".mp4", ".webm", ".ogg", ".opus"];
   const docExt = [".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".zip"];
@@ -256,6 +272,10 @@ function initChatApp() {
 
   function getSearchFilteredMessages(query) {
     const queryLower = query.toLowerCase();
+<<<<<<< codex/add-media-selection-option-in-menu-ets6nw
+=======
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
+>>>>>>> main
     const matches = [];
 
     for (const msg of allMessages) {
@@ -266,6 +286,14 @@ function initChatApp() {
     }
 
     return matches;
+<<<<<<< codex/add-media-selection-option-in-menu-ets6nw
+=======
+=======
+    return allMessages.filter(msg =>
+      `${msg.sender} ${msg.message} ${msg.time} ${msg.date}`.toLowerCase().includes(queryLower)
+    );
+>>>>>>> main
+>>>>>>> main
   }
 
   function getMediaMessages(type) {
@@ -301,8 +329,17 @@ function initChatApp() {
     if (!mediaMessages.length) {
       const emptyState = document.createElement("p");
       emptyState.className = "media-empty";
+<<<<<<< codex/add-media-selection-option-in-menu-ets6nw
       const label = activeMediaType === "image" ? "photos" : activeMediaType === "video" ? "videos" : "stickers";
       emptyState.textContent = `No ${label} in chat yet.`;
+=======
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
+      const label = activeMediaType === "image" ? "photos" : activeMediaType === "video" ? "videos" : "stickers";
+      emptyState.textContent = `No ${label} in chat yet.`;
+=======
+      emptyState.textContent = `No ${activeMediaType === "image" ? "photos" : "videos"} in chat yet.`;
+>>>>>>> main
+>>>>>>> main
       mediaList.appendChild(emptyState);
       return;
     }
@@ -318,7 +355,15 @@ function initChatApp() {
       const previewWrap = document.createElement("div");
       previewWrap.className = "media-preview";
 
+<<<<<<< codex/add-media-selection-option-in-menu-ets6nw
       if (activeMediaType === "image" || activeMediaType === "sticker") {
+=======
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
+      if (activeMediaType === "image" || activeMediaType === "sticker") {
+=======
+      if (activeMediaType === "image") {
+>>>>>>> main
+>>>>>>> main
         const img = document.createElement("img");
         img.src = path;
         img.alt = filename;
@@ -346,6 +391,10 @@ function initChatApp() {
       });
       mediaList.appendChild(card);
     });
+<<<<<<< codex/add-media-selection-option-in-menu-ets6nw
+=======
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
+>>>>>>> main
   }
 
   function getStickerNames() {
@@ -409,6 +458,11 @@ function initChatApp() {
     } finally {
       if (sendBtn) sendBtn.disabled = false;
     }
+<<<<<<< codex/add-media-selection-option-in-menu-ets6nw
+=======
+=======
+>>>>>>> main
+>>>>>>> main
   }
 
   function loadInitialMessages() {
@@ -766,6 +820,10 @@ function initChatApp() {
       renderMediaList();
     });
   });
+<<<<<<< codex/add-media-selection-option-in-menu-ets6nw
+=======
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
+>>>>>>> main
   stickerCloseBtn?.addEventListener("click", closeStickerPanel);
   stickerPanel?.addEventListener("click", event => {
     if (event.target === stickerPanel) closeStickerPanel();
@@ -798,6 +856,11 @@ function initChatApp() {
 
     await submitOutgoingMessage(`${file.name} (file attached)`);
   });
+<<<<<<< codex/add-media-selection-option-in-menu-ets6nw
+=======
+=======
+>>>>>>> main
+>>>>>>> main
 
   searchCloseBtn?.addEventListener("click", closeSearch);
   searchUpBtn?.addEventListener("click", () => goToSearchResult(-1));

@@ -349,7 +349,14 @@ video {
 
 .media-filters {
   display: flex;
+<<<<<<< codex/add-media-selection-option-in-menu-ets6nw
   flex-wrap: wrap;
+=======
+<<<<<<< codex/add-media-selection-option-in-menu-c1yqko
+  flex-wrap: wrap;
+=======
+>>>>>>> main
+>>>>>>> main
   gap: 8px;
   padding: 10px 14px;
   border-bottom: 1px solid #2a3942;
